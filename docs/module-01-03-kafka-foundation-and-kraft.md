@@ -285,15 +285,35 @@ This course runs entirely inside Docker so that learners on macOS and Windows ge
 
 ### What the platform provides
 
-| Container | Purpose | Host port |
-|---|---|---|
-| `kafka1` | Broker + controller (node 1) | `9092` |
-| `kafka2` | Broker + controller (node 2) | `9093` |
-| `kafka3` | Broker + controller (node 3) | `9094` |
-| `kafdrop` | Web UI — browse topics and messages | `9000` |
-| `mysql` | Source database for pipeline labs | `3307` (pipeline profile) |
-| `elasticsearch` | Sink for pipeline labs | `9200` (pipeline profile) |
-| `kafka-connect` | Connector framework for pipeline labs | `8083` (pipeline profile) |
+| Container | Purpose | Host port (from your machine) | Internal port (inside Docker / `docker exec`) |
+|---|---|---|---|
+| `kafka1` | Broker + controller (node 1) | `localhost:9092` | `kafka1:29092` |
+| `kafka2` | Broker + controller (node 2) | `localhost:9093` | `kafka2:29093` |
+| `kafka3` | Broker + controller (node 3) | `localhost:9094` | `kafka3:29094` |
+| `kafdrop` | Web UI — browse topics and messages | `http://localhost:9000` | — |
+| `mysql` | Source database for pipeline labs | `localhost:3307` *(pipeline profile)* | `mysql:3306` *(pipeline profile)* |
+| `elasticsearch` | Sink for pipeline labs | `http://localhost:9200` *(pipeline profile)* | `http://elasticsearch:9200` *(pipeline profile)* |
+| `kafka-connect` | Connector framework for pipeline labs | `http://localhost:8083` *(pipeline profile)* | `http://kafka-connect:8083` *(pipeline profile)* |
+
+> **Which bootstrap address to use — this is important:**
+>
+> Kafka brokers advertise two listeners:
+> - `PLAINTEXT_HOST` (`localhost:909x`) — for clients running **on your host machine**, such as Python scripts and external tools.
+> - `PLAINTEXT` (`kafkaN:2909x`) — for clients running **inside the Docker network**, such as any `docker exec` command or another container.
+>
+> If you use `localhost:9092` inside a `docker exec` command, broker 1 connects but then advertises `localhost:9093` and `localhost:9094` for brokers 2 and 3. Those addresses don't exist inside the container, so you get `Connection to node ... could not be established` warnings.
+>
+> **Rule:** Use `kafka1:29092` as `--bootstrap-server` in every `docker exec` command. Use `localhost:9092` from Python scripts running on your host.ipeline profile)* | `http://kafka-connect:8083` *(pipeline profile)* |
+
+> **Which bootstrap address to use — this is important:**
+>
+> Kafka brokers advertise two listeners:
+> - `PLAINTEXT_HOST` (`localhost:909x`) — for clients running **on your host machine**, such as Python scripts and external tools.
+> - `PLAINTEXT` (`kafkaN:2909x`) — for clients running **inside the Docker network**, such as any `docker exec` command or another container.
+>
+> If you use `localhost:9092` inside a `docker exec` command, broker 1 connects but then advertises `localhost:9093` and `localhost:9094` for brokers 2 and 3. Those addresses don't exist inside the container, so you get `Connection to node ... could not be established` warnings.
+>
+> **Rule:** Use `kafka1:29092` as `--bootstrap-server` in every `docker exec` command. Use `localhost:9092` from Python scripts running on your host.
 
 MySQL, Elasticsearch, and Kafka Connect are only started when you add `--profile pipeline`. All core Kafka and Kafdrop labs use only the four core containers.
 
