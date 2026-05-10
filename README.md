@@ -257,28 +257,33 @@ Invoke-RestMethod http://localhost:8083/connectors
 
 ## 9. Basic Kafka Commands
 
+> **Important — two different bootstrap addresses:**
+> - Use `kafka1:29092` (internal Docker network listener) when running commands **inside a container** with `docker exec`.
+> - Use `localhost:9092` only from clients running **directly on your host machine** (e.g. Python scripts, external tools).
+> Using `localhost:9092` inside a container causes the broker to advertise `localhost:9093` and `localhost:9094` for brokers 2 and 3, which are unreachable from inside the container.
+
 List topics:
 
 ```bash
-docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:29092 --list
 ```
 
 Describe a topic:
 
 ```bash
-docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic m4-simple-topic
+docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:29092 --describe --topic m4-simple-topic
 ```
 
 Produce messages:
 
 ```bash
-docker exec -it kafka1 /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic m4-simple-topic
+docker exec -it kafka1 /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server kafka1:29092 --topic m4-simple-topic
 ```
 
 Consume messages:
 
 ```bash
-docker exec -it kafka1 /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic m4-simple-topic --from-beginning
+docker exec -it kafka1 /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka1:29092 --topic m4-simple-topic --from-beginning
 ```
 
 ## 10. Stop or Reset

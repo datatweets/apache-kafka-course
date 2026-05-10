@@ -5,7 +5,7 @@
 #  Usage: bash scripts/create-topics.sh
 # ============================================================
 
-BOOTSTRAP="localhost:9092"
+BOOTSTRAP="kafka1:29092"
 REPLICATION=3
 PARTITIONS=3
 

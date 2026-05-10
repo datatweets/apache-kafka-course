@@ -4,7 +4,7 @@
 #  Usage from docker/: powershell -ExecutionPolicy Bypass -File scripts/create-topics.ps1
 # ============================================================
 
-$Bootstrap = "localhost:9092"
+$Bootstrap = "kafka1:29092"
 $Replication = 3
 $Partitions = 3
 

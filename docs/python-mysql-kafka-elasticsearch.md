@@ -83,14 +83,14 @@ exit
 The Python pipeline uses separate topics from the course module topics:
 
 ```bash
-docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --if-not-exists --topic python.mysql.customers --partitions 3 --replication-factor 3
-docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --if-not-exists --topic python.mysql.orders --partitions 3 --replication-factor 3
+docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:29092 --create --if-not-exists --topic python.mysql.customers --partitions 3 --replication-factor 3
+docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:29092 --create --if-not-exists --topic python.mysql.orders --partitions 3 --replication-factor 3
 ```
 
 Confirm:
 
 ```bash
-docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:29092 --list
 ```
 
 ## 4. Script 1: MySQL to Kafka
@@ -125,7 +125,7 @@ published orders id=1 to python.mysql.orders
 Inspect the Kafka topic:
 
 ```bash
-docker exec -it kafka1 /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic python.mysql.customers --from-beginning --max-messages 5
+docker exec -it kafka1 /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka1:29092 --topic python.mysql.customers --from-beginning --max-messages 5
 ```
 
 ## 5. Script 2: Kafka to Elasticsearch
@@ -294,8 +294,8 @@ Invoke-RestMethod -Method Delete http://localhost:9200/python-orders
 Delete only the tutorial Kafka topics:
 
 ```bash
-docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic python.mysql.customers
-docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic python.mysql.orders
+docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:29092 --delete --topic python.mysql.customers
+docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:29092 --delete --topic python.mysql.orders
 ```
 
 Stop the full platform:

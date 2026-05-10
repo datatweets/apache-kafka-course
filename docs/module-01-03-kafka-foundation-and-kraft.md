@@ -463,7 +463,7 @@ Produce a test message directly inside `kafka1`:
 
 ```bash
 docker exec -it kafka1 /opt/kafka/bin/kafka-console-producer.sh \
-  --bootstrap-server localhost:9092 \
+  --bootstrap-server kafka1:29092 \
   --topic m4-simple-topic
 ```
 
@@ -479,7 +479,7 @@ Consume it back:
 
 ```bash
 docker exec -it kafka1 /opt/kafka/bin/kafka-console-consumer.sh \
-  --bootstrap-server localhost:9092 \
+  --bootstrap-server kafka1:29092 \
   --topic m4-simple-topic \
   --from-beginning
 ```
@@ -496,14 +496,14 @@ This confirms an end-to-end produce → store → consume cycle on your cluster.
 
 ```bash
 docker exec kafka1 /opt/kafka/bin/kafka-topics.sh \
-  --bootstrap-server localhost:9092 --list
+  --bootstrap-server kafka1:29092 --list
 ```
 
 ### Describe a topic
 
 ```bash
 docker exec kafka1 /opt/kafka/bin/kafka-topics.sh \
-  --bootstrap-server localhost:9092 \
+  --bootstrap-server kafka1:29092 \
   --describe --topic m4-simple-topic
 ```
 
