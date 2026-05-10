@@ -157,16 +157,16 @@ Kafka connects many different systems in a modern data platform:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    SOURCE SYSTEMS                           │
-│  Relational DB  │  Web/App Events  │  IoT Sensors  │  Logs │
+│  Relational DB  │  Web/App Events  │  IoT Sensors   │  Logs │
 └────────┬────────┴────────┬─────────┴───────┬────────┴───┬───┘
          │                 │                 │            │
          ▼                 ▼                 ▼            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    APACHE KAFKA                             │
+│                        APACHE KAFKA                         │
 │              (durable, ordered, scalable log)               │
-└────────┬────────┬────────┬─────────┬───────────────────────┘
-         │        │        │         │
-         ▼        ▼        ▼         ▼
+└────────┬────────┬────────────┬──────────┬───────────────────┘
+         │        │            │          │
+         ▼        ▼            ▼          ▼
    Analytics  Microservice  Search   Data Warehouse
    (Spark,    (consumer     (Elastic  (BigQuery,
     Flink)     groups)      search)   Snowflake)
