@@ -1,0 +1,61 @@
+# ============================================================
+#  Apache Kafka Course — .gitignore
+# ============================================================
+
+# ── Python ────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ── Jupyter ───────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── macOS ─────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# ── Windows ───────────────────────────────────────────────────
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ── IDEs ──────────────────────────────────────────────────────
+.idea/
+.vscode/settings.json
+*.suo
+*.user
+*.sublime-project
+*.sublime-workspace
+
+# ── Docker volumes / local state ──────────────────────────────
+# Do NOT ignore docker/.env — it contains the CLUSTER_ID that
+# must stay consistent for all learners. See README section 1.
+docker/logs/
+docker/tmp/
+
+# ── Secrets / local overrides (if you create these) ──────────
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ── Binary / untracked reference documents ────────────────────
+docs/*.pdf
+docs/*.doc
+docs/*.docx
