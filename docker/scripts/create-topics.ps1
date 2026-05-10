@@ -29,7 +29,10 @@ $Topics = @(
     "m13-stream-input",
     "m13-stream-output",
     "m13-wordcount-input",
-    "m13-wordcount-output"
+    "m13-wordcount-output",
+    "m13-stateless-transform-__assignor-__leader",
+    "m13-word-count-__assignor-__leader",
+    "m13-word-count-m13-wordcount-counts-changelog"
 )
 
 Write-Host ""
@@ -46,13 +49,19 @@ $Failed = 0
 foreach ($Topic in $Topics) {
     Write-Host -NoNewline "  Creating: $Topic ... "
 
+    $ConfigArgs = @()
+    if ($Topic -eq "m13-word-count-m13-wordcount-counts-changelog") {
+        $ConfigArgs = @("--config", "cleanup.policy=compact")
+    }
+
     docker exec kafka1 /opt/kafka/bin/kafka-topics.sh `
         --bootstrap-server $Bootstrap `
         --create `
         --if-not-exists `
         --topic $Topic `
         --partitions $Partitions `
-        --replication-factor $Replication *> $null
+        --replication-factor $Replication `
+        @ConfigArgs *> $null
 
     if ($LASTEXITCODE -eq 0) {
         Write-Host "OK"

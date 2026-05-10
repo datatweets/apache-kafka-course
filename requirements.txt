@@ -3,3 +3,5 @@ confluent-kafka==2.14.0
 mysql-connector-python==9.7.0
 requests==2.33.1
 elasticsearch==9.4.0
+faust-streaming>=0.10.0
+aiokafka==0.12.0

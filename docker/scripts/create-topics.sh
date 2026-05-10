@@ -40,6 +40,9 @@ TOPICS=(
   "m13-stream-output"
   "m13-wordcount-input"
   "m13-wordcount-output"
+  "m13-stateless-transform-__assignor-__leader"
+  "m13-word-count-__assignor-__leader"
+  "m13-word-count-m13-wordcount-counts-changelog"
 )
 
 echo ""
@@ -55,13 +58,20 @@ FAILED=0
 
 for TOPIC in "${TOPICS[@]}"; do
   echo -n "  Creating: ${TOPIC} ... "
+
+  CONFIG_ARGS=()
+  if [ "${TOPIC}" = "m13-word-count-m13-wordcount-counts-changelog" ]; then
+    CONFIG_ARGS=(--config "cleanup.policy=compact")
+  fi
+
   docker exec kafka1 /opt/kafka/bin/kafka-topics.sh \
     --bootstrap-server "${BOOTSTRAP}" \
     --create \
     --if-not-exists \
     --topic "${TOPIC}" \
     --partitions "${PARTITIONS}" \
-    --replication-factor "${REPLICATION}" > /dev/null 2>&1
+    --replication-factor "${REPLICATION}" \
+    "${CONFIG_ARGS[@]}" > /dev/null 2>&1
 
   if [ $? -eq 0 ]; then
     echo "OK"

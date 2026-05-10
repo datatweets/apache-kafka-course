@@ -1,72 +1,82 @@
 # Apache Kafka Course Platform
 
-This repository contains the local platform used for the Apache Kafka course. It runs on Docker Desktop and gives every student the same environment on macOS or Windows:
+<p align="center">
+  <img src="https://img.shields.io/badge/Apache%20Kafka-4.0-231F20?logo=apachekafka&logoColor=white" alt="Apache Kafka 4.0" />
+  <img src="https://img.shields.io/badge/KRaft-No%20ZooKeeper-0A66C2" alt="Kafka KRaft mode" />
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker Compose" />
+  <img src="https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white" alt="Python 3.9+" />
+  <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white" alt="MySQL 8.0" />
+  <img src="https://img.shields.io/badge/Elasticsearch-8.11-005571?logo=elasticsearch&logoColor=white" alt="Elasticsearch 8.11" />
+</p>
 
-- 3 Kafka 4.0 brokers running in KRaft mode (no ZooKeeper)
-- Kafdrop web UI
-- Optional MySQL, Elasticsearch, and Kafka Connect services for pipeline labs
-- Python verification and tutorial scripts
+This repository contains the local platform, course notes, and Python labs for a two-day Apache Kafka course.
 
-The main Docker files are under `docker/`. Run Docker Compose commands from that directory unless a command says otherwise.
+The platform runs a real **3-broker Kafka 4.0 KRaft cluster** on Docker Desktop, plus optional MySQL, Elasticsearch, and Kafka Connect services for pipeline labs.
 
-## 1. Requirements
+> Detailed installation and first-run walkthrough lives in [Module 1-3: Kafka Foundation and KRaft](docs/module-01-03-kafka-foundation-and-kraft.md).  
+> This README is the fast project entry point, not a duplicate of the full setup lesson.
 
-Install these before the course starts.
+---
 
-### macOS
+## What You Get
 
-1. Install Docker Desktop for Mac.
-2. Install Python 3.9 or newer.
-3. Install Git.
-4. Make sure Docker Desktop is running.
-5. In Docker Desktop, allocate at least 6 GB memory if possible. For lower-memory laptops, use 4 GB and reduce heap sizes in `docker/.env`.
+| Area | Included |
+|---|---|
+| Kafka cluster | 3 Kafka 4.0 brokers in KRaft mode: `kafka1`, `kafka2`, `kafka3` |
+| UI | Kafdrop at `http://localhost:9000` |
+| Python labs | Producers, consumers, reliability, pipeline, monitoring, and stream-processing scripts |
+| Pipeline services | Optional MySQL, Elasticsearch, Kafka Connect profile |
+| Course docs | Modules 1-9 and 11-13 currently written; Module 10 planned |
+| Verification | Python setup checker and Kafka round-trip test |
 
-### Windows
+---
 
-1. Install Docker Desktop for Windows.
-2. During Docker Desktop setup, enable WSL 2 if Docker asks for it.
-3. Install Python 3.9 or newer from python.org or the Microsoft Store.
-4. Install Git for Windows.
-5. Use PowerShell for the commands in this README.
-6. Make sure Docker Desktop is running.
-7. In Docker Desktop, allocate at least 6 GB memory if possible. For lower-memory laptops, use 4 GB and reduce heap sizes in `docker/.env`.
-
-## 2. Clone the Repository
-
-macOS:
-
-```bash
-git clone https://github.com/datatweets/apache-kafka-course.git
-cd apache-kafka-course
-```
-
-Windows PowerShell:
-
-```powershell
-git clone https://github.com/datatweets/apache-kafka-course.git
-cd apache-kafka-course
-```
-
-The expected structure after cloning:
+## Repository Layout
 
 ```text
 docker/
-  docker-compose.yml
-  .env
-  connect/
-  init-sql/
-  scripts/
+  docker-compose.yml              # Kafka, Kafdrop, optional pipeline services
+  .env                            # Versions, ports, heap sizes, cluster id
+  connect/                        # Kafka Connect image
+  init-sql/                       # MySQL seed data
+  scripts/                        # Topic creation and verification tools
+
 docs/
-python_pipeline/
+  module-01-03-kafka-foundation-and-kraft.md
+  module-04-kafka-producers.md
+  module-05-kafka-consumers.md
+  module-06-kafka-internals.md
+  module-07-reliable-data-delivery.md
+  module-08-designing-kafka-data-pipelines.md
+  module-09-kafka-pipeline.md
+  module-11-administering-kafka.md
+  module-12-kafka-apis-monitoring.md
+  module-13-stream-processing.md
+
+python_scripts/
+  module04/                       # Producer labs
+  module05/                       # Consumer labs
+  module07/                       # Reliable delivery labs
+  module09/                       # MySQL -> Kafka -> Elasticsearch pipeline
+  module12/                       # Kafka API and monitoring scripts
+  module13/                       # Faust stream processing labs
+
 requirements.txt
 README.md
 ```
 
-## 3. Create the Python Environment
+---
 
-Create a fresh virtual environment on your machine using `requirements.txt`. Each learner must do this step on their own OS — the `.venv` folder is not committed to the repository.
+## Quick Start
 
-macOS:
+Prerequisites:
+
+- Docker Desktop
+- Python 3.9 or newer
+- Git
+- 6 GB Docker memory recommended; 4 GB can work with smaller heap values in `docker/.env`
+
+Run from the repository root:
 
 ```bash
 python3 -m venv .venv
@@ -75,157 +85,56 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-Windows PowerShell:
-
-```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
-
-If PowerShell blocks activation, run:
-
-```powershell
-Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
-.\.venv\Scripts\Activate.ps1
-```
-
-## 4. Configure the Platform
-
-Open `docker/.env` if you need to tune memory or ports.
-
-> **Critical — do not change `CLUSTER_ID` after the first startup.**
-> The `CLUSTER_ID` in `docker/.env` is a fixed base64-encoded UUID that identifies your Kafka cluster.
-> Kafka 4 (KRaft mode) writes this ID into the broker data volumes on first boot.
-> If you change `CLUSTER_ID` after volumes are created, all three brokers will refuse to start because the ID in their volume metadata will no longer match the environment variable.
-> If you need a completely fresh cluster, run `docker compose down -v` first to delete the volumes, then you may change the ID.
-> To generate a new valid ID:
-> ```bash
-> python -c "import uuid,base64; print(base64.urlsafe_b64encode(uuid.uuid4().bytes).decode().rstrip('='))"
-> ```
-
-Default host ports:
-
-| Service | URL or port |
-| --- | --- |
-| Kafka broker 1 | `localhost:9092` |
-| Kafka broker 2 | `localhost:9093` |
-| Kafka broker 3 | `localhost:9094` |
-| Kafdrop | `http://localhost:9000` |
-| MySQL | `localhost:3307` |
-| Elasticsearch | `http://localhost:9200` |
-| Kafka Connect | `http://localhost:8083` |
-
-For laptops with limited memory, edit `docker/.env`:
-
-```env
-KAFKA_HEAP=384m
-KAFKA_HEAP_MIN=256m
-CONNECT_HEAP=384m
-ES_HEAP=256m
-```
-
-Do not change `CLUSTER_ID` after the first successful startup unless you also delete the Docker volumes.
-
-## 5. Start the Core Kafka Platform
-
-Run from the `docker/` directory:
-
-macOS:
+Start Kafka:
 
 ```bash
 cd docker
 docker compose up -d
+bash scripts/create-topics.sh
+cd ..
+python docker/scripts/verify_setup.py
 ```
 
-Windows PowerShell:
-
-```powershell
-cd docker
-docker compose up -d
-```
-
-Wait until the containers become healthy:
-
-```bash
-docker compose ps
-```
-
-Expected core containers:
-
-- `kafka1`
-- `kafka2`
-- `kafka3`
-- `kafdrop`
-
-Open Kafdrop:
+Open:
 
 ```text
 http://localhost:9000
 ```
 
-## 6. Create Course Topics
+Windows users should follow the exact PowerShell commands in [Module 1-3](docs/module-01-03-kafka-foundation-and-kraft.md), especially for virtualenv activation and topic creation.
 
-Run from the `docker/` directory:
+---
 
-macOS:
+## Platform Services
 
-```bash
-bash scripts/create-topics.sh
-```
+| Service | Purpose | Host access | Internal Docker access |
+|---|---|---|---|
+| `kafka1` | Broker + controller | `localhost:9092` | `kafka1:29092` |
+| `kafka2` | Broker + controller | `localhost:9093` | `kafka2:29093` |
+| `kafka3` | Broker + controller | `localhost:9094` | `kafka3:29094` |
+| `kafdrop` | Kafka UI | `http://localhost:9000` | `kafdrop:9000` |
+| `mysql` | Pipeline source DB | `localhost:3307` | `mysql:3306` |
+| `elasticsearch` | Pipeline sink | `http://localhost:9200` | `elasticsearch:9200` |
+| `kafka-connect` | Connector runtime | `http://localhost:8083` | `kafka-connect:8083` |
 
-Windows PowerShell:
+Important address rule:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/create-topics.ps1
-```
+- Use `localhost:9092,localhost:9093,localhost:9094` from Python scripts running on your host machine.
+- Use `kafka1:29092` from commands running inside containers with `docker exec`.
 
-The Bash script also works on Windows if you run it from Git Bash:
+---
 
-```bash
-bash scripts/create-topics.sh
-```
+## Optional Pipeline Stack
 
-After topics are created, refresh Kafdrop and confirm that the course topics are visible.
+Modules 8 and 9 use the optional pipeline services.
 
-## 7. Verify the Core Setup
-
-Go back to the repository root and activate the Python environment.
-
-macOS:
-
-```bash
-cd ..
-source .venv/bin/activate
-python docker/scripts/verify_setup.py
-```
-
-Windows PowerShell:
-
-```powershell
-cd ..
-.\.venv\Scripts\Activate.ps1
-python docker\scripts\verify_setup.py
-```
-
-The script checks Python, dependencies, Docker containers, ports, Kafka produce/consume, Kafdrop, and cluster metadata.
-
-## 8. Start Optional Pipeline Services
-
-Use this only for labs that need MySQL, Elasticsearch, or Kafka Connect.
-
-Run from the `docker/` directory:
+Start them from `docker/`:
 
 ```bash
 docker compose --profile pipeline up -d --build
 ```
 
-The first build downloads Kafka Connect plugins, so it needs internet access and can take several minutes.
-
-Verify the full setup from the repository root:
-
-macOS:
+Verify everything:
 
 ```bash
 cd ..
@@ -233,60 +142,108 @@ source .venv/bin/activate
 python docker/scripts/verify_setup.py --pipeline
 ```
 
-Windows PowerShell:
+The first Kafka Connect build downloads connector plugins and needs internet access.
 
-```powershell
-cd ..
-.\.venv\Scripts\Activate.ps1
-python docker\scripts\verify_setup.py --pipeline
-```
+---
 
-Useful checks:
+## Course Module Map
+
+| Module | Status | Document | Code |
+|---|---|---|---|
+| 1-3: Introduction, installation, KRaft | Ready | [docs/module-01-03-kafka-foundation-and-kraft.md](docs/module-01-03-kafka-foundation-and-kraft.md) | `docker/`, `docker/scripts/` |
+| 4: Producers | Ready | [docs/module-04-kafka-producers.md](docs/module-04-kafka-producers.md) | [python_scripts/module04](python_scripts/module04) |
+| 5: Consumers | Ready | [docs/module-05-kafka-consumers.md](docs/module-05-kafka-consumers.md) | [python_scripts/module05](python_scripts/module05) |
+| 6: Kafka Internals | Ready | [docs/module-06-kafka-internals.md](docs/module-06-kafka-internals.md) | CLI lab with Docker/Kafka tools |
+| 7: Reliable Data Delivery | Ready | [docs/module-07-reliable-data-delivery.md](docs/module-07-reliable-data-delivery.md) | [python_scripts/module07](python_scripts/module07) |
+| 8: Designing Kafka Data Pipelines | Ready | [docs/module-08-designing-kafka-data-pipelines.md](docs/module-08-designing-kafka-data-pipelines.md) | Design-focused |
+| 9: Real-Time Pipeline | Ready | [docs/module-09-kafka-pipeline.md](docs/module-09-kafka-pipeline.md) | [python_scripts/module09](python_scripts/module09) |
+| 10: Cross-Cluster Data Mirroring | Planned | Coming later | Coming later |
+| 11: Administering Kafka | Ready | [docs/module-11-administering-kafka.md](docs/module-11-administering-kafka.md) | CLI-focused |
+| 12: Kafka APIs and Monitoring | Ready | [docs/module-12-kafka-apis-monitoring.md](docs/module-12-kafka-apis-monitoring.md) | [python_scripts/module12](python_scripts/module12), CLI/API |
+| 13: Stream Processing | Ready | [docs/module-13-stream-processing.md](docs/module-13-stream-processing.md) | [python_scripts/module13](python_scripts/module13) |
+
+---
+
+## Running Module Scripts
+
+Activate the virtual environment from the repository root:
 
 ```bash
-curl http://localhost:9200
-curl http://localhost:8083/connectors
+source .venv/bin/activate
 ```
 
-PowerShell alternative:
+Examples:
 
-```powershell
-Invoke-RestMethod http://localhost:9200
-Invoke-RestMethod http://localhost:8083/connectors
+```bash
+python python_scripts/module04/01_simple_producer.py
+python python_scripts/module05/01_simple_consumer.py
+python python_scripts/module07/01_reliable_producer.py
+python python_scripts/module07/02_reliable_consumer.py --max-messages 8
+python python_scripts/module12/01_kafka_api_health_check.py
+python python_scripts/module09/01_explore_mysql_source.py
+python python_scripts/module13/01_stream_producer.py
 ```
 
-## 9. Basic Kafka Commands
+For Module 9, start the pipeline profile first.
 
-> **Important — two different bootstrap addresses:**
-> - Use `kafka1:29092` (internal Docker network listener) when running commands **inside a container** with `docker exec`.
-> - Use `localhost:9092` only from clients running **directly on your host machine** (e.g. Python scripts, external tools).
-> Using `localhost:9092` inside a container causes the broker to advertise `localhost:9093` and `localhost:9094` for brokers 2 and 3, which are unreachable from inside the container.
+For Module 13, open four terminals from the repository root:
+
+```bash
+python python_scripts/module13/01_stream_producer.py
+python python_scripts/module13/02_stateless_transform.py worker -l info
+python python_scripts/module13/03_word_count.py worker -l info --web-port 6067
+python python_scripts/module13/04_stream_monitor.py
+```
+
+---
+
+## Useful Kafka Commands
 
 List topics:
 
 ```bash
-docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:29092 --list
+docker exec kafka1 /opt/kafka/bin/kafka-topics.sh \
+  --bootstrap-server kafka1:29092 \
+  --list
 ```
 
 Describe a topic:
 
 ```bash
-docker exec kafka1 /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:29092 --describe --topic m4-simple-topic
+docker exec kafka1 /opt/kafka/bin/kafka-topics.sh \
+  --bootstrap-server kafka1:29092 \
+  --describe \
+  --topic m7-reliable-topic
 ```
 
-Produce messages:
+Produce from the console:
 
 ```bash
-docker exec -it kafka1 /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server kafka1:29092 --topic m4-simple-topic
+docker exec -it kafka1 /opt/kafka/bin/kafka-console-producer.sh \
+  --bootstrap-server kafka1:29092 \
+  --topic m4-simple-topic
 ```
 
-Consume messages:
+Consume from the console:
 
 ```bash
-docker exec -it kafka1 /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka1:29092 --topic m4-simple-topic --from-beginning
+docker exec -it kafka1 /opt/kafka/bin/kafka-console-consumer.sh \
+  --bootstrap-server kafka1:29092 \
+  --topic m4-simple-topic \
+  --from-beginning
 ```
 
-## 10. Stop or Reset
+Inspect KRaft controller quorum:
+
+```bash
+docker exec kafka1 /opt/kafka/bin/kafka-metadata-quorum.sh \
+  --bootstrap-server kafka1:29092 \
+  describe --status
+```
+
+---
+
+## Stop, Restart, Reset
 
 Stop containers but keep data:
 
@@ -295,56 +252,50 @@ cd docker
 docker compose --profile pipeline down
 ```
 
-Start again with existing data:
+Start again:
 
 ```bash
 docker compose --profile pipeline up -d
 ```
 
-Delete containers and all course data:
+Delete containers and all data volumes:
 
 ```bash
 docker compose --profile pipeline down -v
 ```
 
-Use `down -v` only when you intentionally want a clean reset. It deletes Kafka, MySQL, and Elasticsearch volumes.
+Use `down -v` only when you intentionally want a clean reset.
 
-## 11. Troubleshooting
+Important: do not change `CLUSTER_ID` in `docker/.env` after volumes have been created. If you need a new cluster id, run `docker compose down -v` first.
 
-Docker is not running:
+---
+
+## Troubleshooting
+
+Docker daemon not available:
 
 ```text
 Cannot connect to the Docker daemon
 ```
 
-Start Docker Desktop, wait until it is ready, then run the command again.
+Start Docker Desktop and wait until it is ready.
 
-Port already in use:
-
-```text
-Bind for 0.0.0.0:9000 failed
-```
-
-Stop the other application using the port or change the matching port in `docker/.env`.
-
-Containers are unhealthy:
+Kafka containers not healthy:
 
 ```bash
+cd docker
 docker compose ps
 docker logs kafka1 --tail 100
-docker logs kafka-connect --tail 100
 ```
 
-Python package import fails:
+Python dependency error:
 
 ```bash
+source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-Kafka Connect build fails while downloading plugins:
-
-1. Confirm internet access.
-2. Re-run:
+Kafka Connect plugin build failure:
 
 ```bash
 cd docker
@@ -352,18 +303,16 @@ docker compose --profile pipeline build kafka-connect
 docker compose --profile pipeline up -d
 ```
 
-Windows path or script issues:
+Port conflict:
 
-- Prefer PowerShell for Docker and Python commands.
-- Use Git Bash only for Bash scripts such as `scripts/create-topics.sh`.
-- Do not copy the macOS `.venv` to Windows. Recreate it with `requirements.txt`.
+- Change ports in `docker/.env`, or stop the other process using the port.
 
-## 12. Python Pipeline Tutorial
+---
 
-The Python tutorial for `MySQL -> Kafka -> Elasticsearch` is in:
+## Notes For Instructors
 
-```text
-docs/python-mysql-kafka-elasticsearch.md
-```
-
-It uses the services from this repository and the packages in `requirements.txt`.
+- Keep the README short and operational.
+- Teach detailed installation from [Module 1-3](docs/module-01-03-kafka-foundation-and-kraft.md).
+- Use Module 6 before Module 7; reliability settings make more sense after leaders, replicas, and ISR are visible.
+- Use Module 8 as the pipeline design bridge before the Module 9 implementation.
+- Module 10 remains planned; Modules 11-13 are available for the current course path.
