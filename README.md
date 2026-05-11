@@ -26,7 +26,7 @@ The platform runs a real **3-broker Kafka 4.0 KRaft cluster** on Docker Desktop,
 | UI | Kafdrop at `http://localhost:9000` |
 | Python labs | Producers, consumers, reliability, pipeline, monitoring, and stream-processing scripts |
 | Pipeline services | Optional MySQL, Elasticsearch, Kafka Connect profile |
-| Course docs | Modules 1-9 and 11-13 currently written; Module 10 planned |
+| Course docs | Modules 1-13 currently written |
 | Verification | Python setup checker and Kafka round-trip test |
 
 ---
@@ -49,6 +49,7 @@ docs/
   module-07-reliable-data-delivery.md
   module-08-designing-kafka-data-pipelines.md
   module-09-kafka-pipeline.md
+  module-10-cross-cluster-data-mirroring.md
   module-11-administering-kafka.md
   module-12-kafka-apis-monitoring.md
   module-13-stream-processing.md
@@ -157,7 +158,7 @@ The first Kafka Connect build downloads connector plugins and needs internet acc
 | 7: Reliable Data Delivery | Ready | [docs/module-07-reliable-data-delivery.md](docs/module-07-reliable-data-delivery.md) | [python_scripts/module07](python_scripts/module07) |
 | 8: Designing Kafka Data Pipelines | Ready | [docs/module-08-designing-kafka-data-pipelines.md](docs/module-08-designing-kafka-data-pipelines.md) | Design-focused |
 | 9: Real-Time Pipeline | Ready | [docs/module-09-kafka-pipeline.md](docs/module-09-kafka-pipeline.md) | [python_scripts/module09](python_scripts/module09) |
-| 10: Cross-Cluster Data Mirroring | Planned | Coming later | Coming later |
+| 10: Cross-Cluster Data Mirroring | Ready | [docs/module-10-cross-cluster-data-mirroring.md](docs/module-10-cross-cluster-data-mirroring.md) | Theory with CLI demonstrations |
 | 11: Administering Kafka | Ready | [docs/module-11-administering-kafka.md](docs/module-11-administering-kafka.md) | CLI-focused |
 | 12: Kafka APIs and Monitoring | Ready | [docs/module-12-kafka-apis-monitoring.md](docs/module-12-kafka-apis-monitoring.md) | [python_scripts/module12](python_scripts/module12), CLI/API |
 | 13: Stream Processing | Ready | [docs/module-13-stream-processing.md](docs/module-13-stream-processing.md) | [python_scripts/module13](python_scripts/module13) |
@@ -315,4 +316,4 @@ Port conflict:
 - Teach detailed installation from [Module 1-3](docs/module-01-03-kafka-foundation-and-kraft.md).
 - Use Module 6 before Module 7; reliability settings make more sense after leaders, replicas, and ISR are visible.
 - Use Module 8 as the pipeline design bridge before the Module 9 implementation.
-- Module 10 remains planned; Modules 11-13 are available for the current course path.
+- Module 10 is theory focused because the local platform runs one Kafka cluster; use it to frame real multi-cluster designs before Module 11 administration.
